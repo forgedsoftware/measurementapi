@@ -14,7 +14,6 @@
 		"express": "latest",
 		"body-parser": "latest",
 		"cors": "latest",
-		"express-rate-limit": "latest",
 		"swagger-node-express": "latest",
 		"swagger-ui": "latest",
 		"js2xmlparser": "latest",

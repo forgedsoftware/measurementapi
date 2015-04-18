@@ -7,7 +7,8 @@ var cors = require("cors");
 var models = require('./models');
 var swagger = require('swagger-node-express').createNew(app);
 var toXml = require("js2xmlparser");
-var RateLimit = require('express-rate-limit');
+var limiter = require('./lib/rate_limit');
+
 
 var corsOptions = {
   credentials: true,
@@ -22,30 +23,10 @@ var corsOptions = {
   }
 };
 
-var limiter = RateLimit({
-	windowMs: 60 * 60 * 1000 / 500, // miliseconds - how long to keep records of requests in memory - 500 per hour
-	delayMs: 0, // milliseconds - base delay applied to the response - multiplied by number of recent hits from user's IP 
-	max: 100, // max number of recent connections during `window` miliseconds before (temporarily) bocking the user.
-	global: false // if true, IP address is ignored and setting is applied equally to all requests 
-});
-
-var limiterExcludeStatic = function (req, res, next) {
-	var path = req._parsedUrl.pathname;
-	if (startsWith(path, '/docs') || startsWith(path, '/static-docs')) {
-		next();
-	} else {
-		limiter(req, res, next);
-	}
-}
-
-function startsWith (value, strStart) {
-	return value.lastIndexOf(strStart, 0) === 0;
-}
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
-app.use(limiterExcludeStatic);
+app.use(limiter.limiterExcludeStatic(['/docs', '/static-docs', '/api-docs']));
 
 var port = process.env.PORT || 8080;
 
@@ -61,6 +42,14 @@ swagger.setApiInfo({
 app.get('/', function (req, res) {
   res.send('Measurement API provides functionality for unit conversion and manipulating dimensions.');
 });
+
+// Status
+
+app.get('/status', function (req, res) {
+	var status = limiter.limitStatus(req);
+	res.send(status);
+});
+
 
 // Find
 
