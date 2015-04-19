@@ -1,0 +1,124 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"title": "Measurement API",
+		"description": "Measurement API provides functionality for unit conversion and manipulating dimensions.",
+		"version": "1.0",
+		"contact": {
+			"name": "Forged Software",
+			"url": "http://www.forgedsoftware.com",
+			"email": "contact@forgedsoftware.com"
+		},
+		"license": {
+			"name": "MIT License",
+			"url": "https://github.com/forgedsoftware/measurementapi/blob/master/LICENSE"
+		}
+	},
+	"produces": ["application/json", "application/xml"],
+	"host": "localhost:8080",
+	"basePath": "/",
+	"paths": {
+		"/dimensions": {
+			"get": {
+				"summary": "Returns all dimension keys",
+				"description": "Returns the dimension keys for all known dimensions.",
+				"produces": ["application/json", "application/xml"],
+				"operationId": "getDimensionKeys",
+				"tags": ["discover keys"],
+				"responses": {
+					"200": {
+						"description": "Keys of all dimensions",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/units/{dimensionKey}": {
+			"get": {
+				"summary": "Returns all unit keys in dimension",
+				"description": "Returns all of the unit keys for a specific dimension.",
+				"produces": ["application/json", "application/xml"],
+				"operationId": "getUnitKeys",
+				"tags": ["discover keys"],
+				"parameters": [{
+					"name": "dimensionKey",
+					"description": "Dimension key to reference",
+					"in": "path",
+					"required": true,
+					"type": "string",
+					"default": "time"
+				}],
+				"responses": {
+					"200": {
+						"description": "Keys of all units in dimension",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dimension/{dimensionKey}": {
+			"get": {
+				"summary": "Returns details on a specified dimension",
+				"description": "Returns all of the details of a specific dimension.",
+				"produces": ["application/json", "application/xml"],
+				"operationId": "getDimension",
+				"tags": ["discover entities"],
+				"parameters": [{
+					"name": "dimensionKey",
+					"description": "Dimension key to reference",
+					"in": "path",
+					"required": true,
+					"type": "string",
+					"default": "time"
+				}],
+				"responses": {
+					"200": {
+						"description": "Dimension details",
+						"schema": {
+							"$ref": "#/definitions/Dimension"
+						}
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"Dimension": {
+			"type": "object",
+			"required": ["name", "baseUnit", "units"],
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"otherNames": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"baseUnit": {
+					"type": "string"
+				},
+				"units": {
+					"type": "array",
+					"items": {
+						
+					}
+				},
+				"vector": {
+					"type": "boolean"
+				}
+			}
+		}
+	}
+}
