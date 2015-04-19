@@ -90,6 +90,38 @@
 					}
 				}
 			}
+		},
+		"/unit/{dimensionKey}/{unitKey}": {
+			"get": {
+				"summary": "Returns details on a specified unit",
+				"description": "Returns all of the details of a specific unit.",
+				"produces": ["application/json", "application/xml"],
+				"operationId": "getUnit",
+				"tags": ["discover entities"],
+				"parameters": [{
+					"name": "dimensionKey",
+					"description": "Dimension key which contains the unit",
+					"in": "path",
+					"required": true,
+					"type": "string",
+					"default": "time"
+				}, {
+					"name": "unitKey",
+					"description": "Key of unit to be fetched",
+					"in": "path",
+					"required": true,
+					"type": "string",
+					"default": "second"
+				}],
+				"responses": {
+					"200": {
+						"description": "Unit details",
+						"schema": {
+							"$ref": "#/definitions/Unit"
+						}
+					}
+				}
+			}
 		}
 	},
 	"definitions": {
@@ -117,6 +149,60 @@
 				},
 				"vector": {
 					"type": "boolean"
+				}
+			}
+		},
+		"Unit": {
+			"type": "object",
+			"required": ["name", "type"],
+			"properties": {
+				"name": {
+					"type": "string",
+					"description": "Name of the unit"
+				},
+				"plural": {
+					"type": "string",
+					"description": "Plural name of the unit"
+				},
+				"otherNames": {
+					"type": "array",
+					"description": "Other names of the unit",
+					"items": {
+						"type": "string"
+					}
+				},
+				"otherSymbols": {
+					"type": "array",
+					"description": "Other symbols of the unit",
+					"items": {
+						"type": "string"
+					}
+				},
+				"symbol": {
+					"type": "string",
+					"description": "Symbol of the unit"
+				},
+				"type": {
+					"type": "string",
+					"description": "Type of the unit"
+				},
+				"systems": {
+					"type": "array",
+					"description": "Keys of the systems the unit belongs to",
+					"items": {
+						"type": "string"
+					}
+				},
+				"tags": {
+					"type": "array",
+					"description": "Tags that apply to the unit",
+					"items": {
+						"type": "string"
+					}
+				},
+				"notes": {
+					"type": "string",
+					"description": "Notes on the unit"
 				}
 			}
 		}
