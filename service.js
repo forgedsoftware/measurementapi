@@ -4,7 +4,6 @@ var app = express();
 var bodyParser = require('body-parser');
 var m = require('measurejs');
 var cors = require("cors");
-var models = require('./models');
 
 var toXml = require("js2xmlparser");
 var limiter = require('./lib/rate_limit');
