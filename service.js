@@ -5,7 +5,8 @@ var express = require('express'),
 	m = require('measurejs'),
 	toXml = require("js2xmlparser"),
 	limiter = require('./lib/rate_limit'),
-	acceptHeader = require('./lib/accept_header');
+	acceptHeader = require('./lib/accept_header'),
+	h = require('./lib/helpers');
 
 var staticPaths = ['/docs', '/static-docs', '/api-docs'];
 var port = process.env.PORT || 8080;
@@ -17,7 +18,7 @@ app.use(limiter.limiterExcludeStatic(staticPaths));
 // VERSIONING
 
 var routes = {},
-	versions = {},
+	versions = [],
 	routePath = require("path").join(__dirname, "lib/routes"),
 	latestRouteKey = 'v1.js';
 
@@ -43,26 +44,28 @@ provisionVersion(latestRouteKey, 'Latest', '', [
 
 function provisionVersion(key, name, path, accept) {
 	var route = routes[key];
-	versions[name] = {
+	versions.push({
+		name: name,
 		path: path,
 		accept: accept,
-	};
+	});
 	app.use(path, route);
 }
 
 app.get('/versions', function (req, res) {
-	res.send(versions);
+	h.sendResponse(req, res, versions, 'versions');
 });
 
 // CROSS-VERSION FUNCTIONALITY
 
 app.get('/', function (req, res) {
+	// As json/xml??
 	res.send('Measurement API provides functionality for unit conversion and manipulating dimensions.');
 });
 
 app.get('/status', function (req, res) {
 	var status = limiter.limitStatus(req);
-	res.send(status);
+	h.sendResponse(req, res, status, 'status');
 });
 
 // DOCUMENTATION
