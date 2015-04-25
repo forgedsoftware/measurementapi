@@ -4,13 +4,15 @@ var express = require('express'),
 	bodyParser = require('body-parser'),
 	m = require('measurejs'),
 	toXml = require("js2xmlparser"),
-	limiter = require('./lib/rate_limit');
+	limiter = require('./lib/rate_limit'),
+	acceptHeader = require('./lib/accept_header');
+
+var staticPaths = ['/docs', '/static-docs', '/api-docs'];
+var port = process.env.PORT || 8080;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(limiter.limiterExcludeStatic(['/docs', '/static-docs', '/api-docs']));
-
-var port = process.env.PORT || 8080;
+app.use(limiter.limiterExcludeStatic(staticPaths));
 
 // VERSIONING
 
@@ -24,12 +26,20 @@ require("fs").readdirSync(routePath).forEach(function (file) {
 	routes[file] = require("./lib/routes/" + file);
 });
 
+// Utilise accept header versioning
+app.use(acceptHeader(routes, staticPaths));
+
 // Apply routes to express and set up versions object
 for (var routeKey in routes) {
 	var route = routes[routeKey];
 	provisionVersion(routeKey, route.version.name, route.version.path, route.version.accept);
 }
-provisionVersion(latestRouteKey, 'Latest', '', 'application/vnd.measurement+json');
+provisionVersion(latestRouteKey, 'Latest', '', [
+	'application/json',
+	'application/xml',
+	'application/vnd.measurement+json',
+	'application/vnd.measurement+xml'
+]);
 
 function provisionVersion(key, name, path, accept) {
 	var route = routes[key];
