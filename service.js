@@ -11,6 +11,8 @@ var express = require('express'),
 var staticPaths = ['/docs', '/static-docs', '/api-docs'];
 var port = process.env.PORT || 8080;
 
+// GENERAL MIDDLEWARE
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(limiter.limiterExcludeStatic(staticPaths));
@@ -20,7 +22,7 @@ app.use(limiter.limiterExcludeStatic(staticPaths));
 var routes = {},
 	versions = [],
 	routePath = require("path").join(__dirname, "lib/routes"),
-	latestRouteKey = 'v1.js';
+	latestRouteFileName = 'v1.js';
 
 // Load routes dynamically
 require("fs").readdirSync(routePath).forEach(function (file) {
@@ -36,7 +38,9 @@ for (var routeKey in routes) {
 	var route = routes[routeKey];
 	provisionVersion(routeKey, route.version.name, route.version.path, route.version.accept);
 }
-provisionVersion(latestRouteKey, 'Latest', '', [
+
+// Apply latest api version
+provisionVersion(latestRouteFileName, 'Latest', '', [
 	'application/json',
 	'application/xml',
 	'application/vnd.measurement+json',
@@ -52,6 +56,12 @@ function provisionVersion(key, name, path, accept) {
 	});
 	app.use(path, route);
 }
+
+// Reset Server header for requests that get this far
+app.use(function (req, res, next) {
+	res.set('Server', 'Measurement/v*');
+	next();
+});
 
 app.get('/versions', function (req, res) {
 	h.sendResponse(req, res, versions, 'versions');
