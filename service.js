@@ -28,7 +28,8 @@ require("fs").readdirSync(routePath).forEach(function (file) {
 });
 
 // Utilise accept header versioning
-app.use(acceptHeader(routes, staticPaths));
+var crossVersionPaths = staticPaths.concat(['/versions', '/status']);
+app.use(acceptHeader(routes, crossVersionPaths));
 
 // Apply routes to express and set up versions object
 for (var routeKey in routes) {
@@ -57,11 +58,6 @@ app.get('/versions', function (req, res) {
 });
 
 // CROSS-VERSION FUNCTIONALITY
-
-app.get('/', function (req, res) {
-	// As json/xml??
-	res.send('Measurement API provides functionality for unit conversion and manipulating dimensions.');
-});
 
 app.get('/status', function (req, res) {
 	var status = limiter.limitStatus(req);
