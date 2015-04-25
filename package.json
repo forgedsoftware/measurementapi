@@ -13,7 +13,6 @@
 	"dependencies": {
 		"express": "latest",
 		"body-parser": "latest",
-		"cors": "latest",
 		"swagger-ui": "latest",
 		"js2xmlparser": "latest",
 		"measurejs": "latest"

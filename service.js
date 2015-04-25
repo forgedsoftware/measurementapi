@@ -1,66 +1,48 @@
 
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var m = require('measurejs');
-var cors = require("cors");
-
-var toXml = require("js2xmlparser");
-var limiter = require('./lib/rate_limit');
-
-
-var corsOptions = {
-  credentials: true,
-  origin: function(origin,callback) {
-    if(origin===undefined) {
-      callback(null,false);
-    } else {
-      var match = origin.match("^(.*)?.localhost(\:[0-9]+)?");
-      var allowed = (match!==null && match.length > 0);
-      callback(null,allowed);
-    }
-  }
-};
+var express = require('express'),
+	app = express(),
+	bodyParser = require('body-parser'),
+	m = require('measurejs'),
+	toXml = require("js2xmlparser"),
+	limiter = require('./lib/rate_limit');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors(corsOptions));
 app.use(limiter.limiterExcludeStatic(['/docs', '/static-docs', '/api-docs']));
 
 var port = process.env.PORT || 8080;
 
-var router = express.Router();
-
 // VERSIONING
 
-var VERSIONS = {
-	'Pre-Production': {
-		path: '/v0',
-		accept: 'application/vnd.measurement.v0+json'
-	},
-	'Version 1': {
-		path: '/v1',
-		accept: 'application/vnd.measurement.v1+json'
-	},
-	'Latest': {
-		path: '',
-		accept: 'application/vnd.measurement+json'
-	},
-};
+var routes = {},
+	versions = {},
+	routePath = require("path").join(__dirname, "lib/routes"),
+	latestRouteKey = 'v1.js';
 
-var latestVersionPath = '/v1';
-
-app.get('/versions', function (req, res) {
-	res.send(VERSIONS);
+// Load routes dynamically
+require("fs").readdirSync(routePath).forEach(function (file) {
+	routes[file] = require("./lib/routes/" + file);
 });
 
-for (var k in VERSIONS) {
-	if (VERSIONS[k].path !== '') {
-		app.use(VERSIONS[k].path, require('./lib/routes' + VERSIONS[k].path));
-	} else {
-		app.use(VERSIONS[k].path, require('./lib/routes' + latestVersionPath));
-	}
+// Apply routes to express and set up versions object
+for (var routeKey in routes) {
+	var route = routes[routeKey];
+	provisionVersion(routeKey, route.version.name, route.version.path, route.version.accept);
 }
+provisionVersion(latestRouteKey, 'Latest', '', 'application/vnd.measurement+json');
+
+function provisionVersion(key, name, path, accept) {
+	var route = routes[key];
+	versions[name] = {
+		path: path,
+		accept: accept,
+	};
+	app.use(path, route);
+}
+
+app.get('/versions', function (req, res) {
+	res.send(versions);
+});
 
 // CROSS-VERSION FUNCTIONALITY
 
@@ -73,9 +55,13 @@ app.get('/status', function (req, res) {
 	res.send(status);
 });
 
+// DOCUMENTATION
+
 app.use('/api-docs', express.static(__dirname + '/docs/api-docs.json'));
 app.use('/static-docs', express.static(__dirname + '/node_modules/swagger-ui/dist'));
 app.use('/docs', express.static(__dirname + '/docs'));
+
+// START SERVICE
 
 app.listen(port);
 console.log('Measurement API Service started on port ' + port);
