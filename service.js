@@ -9,6 +9,7 @@ var express = require('express'),
 	h = require('./lib/helpers');
 
 var staticPaths = ['/docs', '/static-docs', '/api-docs'];
+var crossVersionPaths = ['/versions', '/status'];
 var port = process.env.PORT || 8080;
 
 // GENERAL MIDDLEWARE
@@ -30,8 +31,7 @@ require("fs").readdirSync(routePath).forEach(function (file) {
 });
 
 // Utilise accept header versioning
-var crossVersionPaths = staticPaths.concat(['/versions', '/status']);
-app.use(acceptHeader(routes, crossVersionPaths));
+app.use(acceptHeader(routes, crossVersionPaths, staticPaths));
 
 // Apply routes to express and set up versions object
 for (var routeKey in routes) {
