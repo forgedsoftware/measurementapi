@@ -18,10 +18,15 @@
 		"measurejs": "latest"
 	},
 	"devDependencies": {
+		"mocha": "latest",
+		"should": "latest"
 	},
 	"engines": {
 		"node": ">=0.10"
 	},
+	"scripts": {
+		"test": "mocha -u tdd test/*"
+    },
 	"repository": {
         "type": "git",
         "url": "http://github.com/forgedsoftware/measurementapi.git"
