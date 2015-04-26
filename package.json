@@ -9,7 +9,7 @@
 	"contributors": [
         "Matthew Harward"
     ],
-	"main": "./service.js",
+	"main": "./lib/service.js",
 	"dependencies": {
 		"express": "latest",
 		"body-parser": "latest",
@@ -25,7 +25,8 @@
 		"node": ">=0.10"
 	},
 	"scripts": {
-		"test": "mocha -u tdd test/*"
+		"test": "mocha -u tdd test/*",
+		"start": "node ./lib/service.js"
     },
 	"repository": {
         "type": "git",
