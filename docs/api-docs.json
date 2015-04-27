@@ -2,7 +2,7 @@
 	"swagger": "2.0",
 	"info": {
 		"title": "Measurement API",
-		"description": "Measurement API provides functionality for unit conversion and manipulating dimensions.",
+		"description": "Measurement API provides functionality for unit conversion and manipulating dimensions. Documentation of each endpoint is provided below.\r\n\r\n### Features\r\n- Find/discover functionality for units, dimensions, measurement systems, and prefixes.\r\n- Conversion functionality of an amount between two unit types.\r\n\r\n### Technical Details\r\n\r\n#### Versioning\r\n- This documentation details the latest version of API. Older versions are undocumented but do exist.\r\n- For existing versions see the ```/versions``` endpoint.\r\n- This API supports explicit URL versioning and accept header versioning.\r\n  - URL - Prefix the url with ```/v``` + ```number```, for example:  ```/v0/endpoint/here```. Omit the prefix for the latest version.\r\n  - Accept Header - Omit the prefix from the URL and add an accept header in the form ```application/vnd.measurement.v0+json```. The version in the first mime type specified is used. If the version is specified in the URL, the version in the accept header is ignored. Unknown versions are also ignored.\r\n\r\n#### Usage Limits\r\n- Usage limits exist per IP address.\r\n- Users are allowed an hourly max of 500 requests.\r\n- Users are allowed a burst max of 50 requests in a 2 minute interval.\r\n- See ```/status``` for your current usage details.\r\n- If you wish to have a higher limit, please contact us.\r\n\r\n#### Accept Header Mime-Types\r\n- The default return type when no headers are specified is JSON (```application/json```).\r\n- This API accepts ```application/json``` and ```application/xml``` (or ```text/xml``` if you prefer).\r\n- Vender accept headers may be used in the form ```application/vnd.measurement.v1+json``` if desired.",
 		"version": "1.0",
 		"contact": {
 			"name": "Forged Software",
@@ -14,6 +14,7 @@
 			"url": "https://github.com/forgedsoftware/measurementapi/blob/master/LICENSE"
 		}
 	},
+	"consumes": ["application/json", "application/xml", "application/vnd.measurement+json", "application/vnd.measurement+xml"],
 	"produces": ["application/json", "application/xml"],
 	"host": "localhost:8080",
 	"basePath": "/",
